@@ -1,6 +1,7 @@
 # Owen-Shi-ISU-Data-Management
 This is a Data Management Web App built using HTML. It allows users to input datasets, calculate statistical measures, and visualize the data using a box-and-whisker plot. The app also includes advanced features like Comparison Mode and Graph Customization for a more interactive and personalized experience.
 
+
 Features
 
 User Input Form:
@@ -26,6 +27,7 @@ Toggle between light and dark themes for better readability.
 Real-Time Updates:
 Statistics and visualizations update instantly as users modify the input data or customization settings.
 
+
 How to Use
 
 Input Data:
@@ -48,5 +50,7 @@ Dataset 1: 15, 25, 35, 40, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100
 
 Dataset 2: 10, 20, 30, 45, 55, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110
 
+=
 Try It Out
 Simply open the https://stillwaterowen.github.io/Owen-Shi-ISU-Data-Management/ in your browser to use the app. No additional setup is required!
+=
