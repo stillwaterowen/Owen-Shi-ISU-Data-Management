@@ -1,582 +1,713 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Management Web App</title>
-    <!-- Add required Chart.js scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-    <style>
-        /* Global Styles */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f9fafb;
-            color: #374151;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Management Web App</title>
+  <!-- Chart.js and D3.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9fafb;
+      color: #374151;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 20px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+    .container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
 
-        .header h1 {
-            font-size: 2.5rem;
-            color: #6fb5e3;
-            margin: 0;
-        }
+    .header h1 {
+      font-size: 2.5rem;
+      color: #6fb5e3;
+      margin: 0;
+    }
 
-        .input-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
+    .input-section {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
 
-        .input-section input {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
+    .input-section input {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
 
-        .input-section input:focus {
-            border-color: #1e40af;
-        }
+    .input-section input:focus {
+      border-color: #1e40af;
+    }
 
-        .input-section button {
-            padding: 12px 24px;
-            background-color: #6fb5e3;
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-        }
+    .input-section button {
+      padding: 12px 24px;
+      background-color: #6fb5e3;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
 
-        .input-section button:hover {
-            background-color: #1e3a8a;
-        }
+    .input-section button:hover {
+      background-color: #1e3a8a;
+    }
 
-        .error {
-            color: #dc2626;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            width: 100%;
-        }
+    .error {
+      color: #dc2626;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      width: 100%;
+    }
 
-        .results-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
+    .results-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
 
-        .stats-box {
-            background: #f3f4f6;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+    .stats-box {
+      background: #f3f4f6;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-        .stats-box h2 {
-            font-size: 1.5rem;
-            color: #6fb5e3;
-            margin-bottom: 15px;
-        }
+    .stats-box h2 {
+      font-size: 1.5rem;
+      color: #6fb5e3;
+      margin-bottom: 15px;
+    }
 
-        .stat-item {
-            margin-bottom: 10px;
-            font-size: 1rem;
-        }
+    .stat-item {
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
 
-        .stat-item span {
-            font-weight: 600;
-            color: #6fb5e3;
-        }
+    .stat-item span {
+      font-weight: 600;
+      color: #6fb5e3;
+    }
 
-        .visualization-box {
-            grid-column: 1 / -1;
-            margin-top: 20px;
-        }
+    .visualization-box {
+      grid-column: 1 / -1;
+      margin-top: 20px;
+      background: #f3f4f6;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-        #boxPlotContainer {
-            width: 100%;
-            height: 400px;
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+    #boxPlotContainer {
+      width: 100%;
+      height: 400px;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
 
-        .box-plot-svg {
-            width: 100%;
-            height: 100%;
-        }
+    .box-plot-svg {
+      width: 100%;
+      height: 100%;
+    }
 
-        .box {
-            fill-opacity: 0.2;
-            stroke-width: 2;
-        }
+    .box {
+      fill-opacity: 0.2;
+      stroke-width: 2;
+    }
 
-        .median-line {
-            stroke: #374151;
-            stroke-width: 2;
-        }
+    .median-line {
+      stroke: #374151;
+      stroke-width: 2;
+    }
 
-        .whisker {
-            stroke: #374151;
-            stroke-width: 2;
-        }
+    .whisker {
+      stroke: #374151;
+      stroke-width: 2;
+    }
 
-        .outlier {
-            fill: red;
-        }
+    .outlier {
+      fill: red;
+    }
 
-        .customization-panel {
-            margin-top: 20px;
-            padding: 20px;
-            background: #f3f4f6;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
+    /* Canvas styles for Chart.js charts */
+    .visualization-box canvas {
+      max-width: 100%;
+      height: 400px;
+      margin-bottom: 20px;
+    }
 
-        .customization-panel h2 {
-            font-size: 1.5rem;
-            color: #6fb5e3;
-            margin-bottom: 15px;
-        }
+    .customization-panel {
+      margin-top: 20px;
+      padding: 20px;
+      background: #f3f4f6;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-        .customization-panel label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 1rem;
-        }
+    .customization-panel h2 {
+      font-size: 1.5rem;
+      color: #6fb5e3;
+      margin-bottom: 15px;
+    }
 
-        .customization-panel input[type="color"] {
-            margin-left: 10px;
-        }
+    .customization-panel label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
 
-        .theme-toggle {
-            margin-top: 20px;
-        }
+    .customization-panel input[type="color"] {
+      margin-left: 10px;
+    }
 
-        .theme-toggle button {
-            padding: 10px 20px;
-            background-color: #6fb5e3;
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-        }
+    .theme-toggle {
+      margin-top: 20px;
+    }
 
-        .theme-toggle button:hover {
-            background-color: #1e3a8a;
-        }
+    .theme-toggle button {
+      padding: 10px 20px;
+      background-color: #6fb5e3;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
 
-        /* Dark Theme */
-        body.dark-theme {
-            background-color: #1f2937;
-            color: #f9fafb;
-        }
+    .theme-toggle button:hover {
+      background-color: #1e3a8a;
+    }
 
-        body.dark-theme .container {
-            background: #374151;
-        }
+    /* Dark Theme */
+    body.dark-theme {
+      background-color: #1f2937;
+      color: #f9fafb;
+    }
 
-        body.dark-theme .stats-box,
-        body.dark-theme .customization-panel {
-            background: #4b5563;
-        }
+    body.dark-theme .container {
+      background: #374151;
+    }
 
-        body.dark-theme .input-section input {
-            background: #4b5563;
-            border-color: #6b7280;
-            color: #f9fafb;
-        }
+    body.dark-theme .stats-box,
+    body.dark-theme .customization-panel,
+    body.dark-theme .visualization-box {
+      background: #4b5563;
+    }
 
-        body.dark-theme .input-section input:focus {
-            border-color: #1e40af;
-        }
+    body.dark-theme .input-section input {
+      background: #4b5563;
+      border-color: #6b7280;
+      color: #f9fafb;
+    }
 
-        body.dark-theme .stats-box h2,
-        body.dark-theme .customization-panel h2 {
-            color: #93c5fd;
-        }
+    body.dark-theme .input-section input:focus {
+      border-color: #1e40af;
+    }
 
-        body.dark-theme .stat-item span {
-            color: #93c5fd;
-        }
+    body.dark-theme .stats-box h2,
+    body.dark-theme .customization-panel h2 {
+      color: #93c5fd;
+    }
 
-        body.dark-theme #boxPlotContainer {
-            background: #4b5563;
-        }
-    </style>
+    body.dark-theme .stat-item span {
+      color: #93c5fd;
+    }
+
+    body.dark-theme #boxPlotContainer {
+      background: #4b5563;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Data Management Web App</h1>
-        </div>
-
-        <div class="input-section">
-            <input type="text" id="dataInput1" placeholder="Enter Dataset 1 (e.g., 1,2,3,4,5)">
-            <input type="text" id="dataInput2" placeholder="Enter Dataset 2 (e.g., 6,7,8,9,10)">
-            <button onclick="processData()">Calculate</button>
-            <button onclick="toggleSort()">Toggle Sort</button>
-            <div id="errorMessage" class="error"></div>
-        </div>
-
-        <div class="results-section">
-            <div class="stats-box">
-                <h2>Dataset 1 Statistics</h2>
-                <div class="stat-item">Mean: <span id="mean1"></span></div>
-                <div class="stat-item">Median: <span id="median1"></span></div>
-                <div class="stat-item">Mode: <span id="mode1"></span></div>
-                <div class="stat-item">Q1: <span id="q1_1"></span></div>
-                <div class="stat-item">Q3: <span id="q3_1"></span></div>
-                <div class="stat-item">Min: <span id="min1"></span></div>
-                <div class="stat-item">Max: <span id="max1"></span></div>
-                <div class="stat-item">Outliers: <span id="outliers1"></span></div>
-            </div>
-
-            <div class="stats-box">
-                <h2>Dataset 2 Statistics</h2>
-                <div class="stat-item">Mean: <span id="mean2"></span></div>
-                <div class="stat-item">Median: <span id="median2"></span></div>
-                <div class="stat-item">Mode: <span id="mode2"></span></div>
-                <div class="stat-item">Q1: <span id="q1_2"></span></div>
-                <div class="stat-item">Q3: <span id="q3_2"></span></div>
-                <div class="stat-item">Min: <span id="min2"></span></div>
-                <div class="stat-item">Max: <span id="max2"></span></div>
-                <div class="stat-item">Outliers: <span id="outliers2"></span></div>
-            </div>
-
-            <div class="visualization-box">
-                <h2>Box and Whisker Plot (Comparison)</h2>
-                <div id="boxPlotContainer">
-                    <svg class="box-plot-svg"></svg>
-                </div>
-            </div>
-
-            <div class="customization-panel">
-                <h2>Graph Customization</h2>
-                <label>
-                    Dataset 1 Color:
-                    <input type="color" id="color1" value="#1e40af">
-                </label>
-                <label>
-                    Dataset 2 Color:
-                    <input type="color" id="color2" value="#dc2626">
-                </label>
-                <label>
-                    Outlier Color:
-                    <input type="color" id="outlierColor" value="#ff0000">
-                </label>
-                <div class="theme-toggle">
-                    <button onclick="toggleTheme()">Toggle Dark Theme</button>
-                </div>
-            </div>
-        </div>
+  <div class="container">
+    <div class="header">
+      <h1>Data Management Web App</h1>
     </div>
 
-    <script>
-        let currentData1 = [];
-        let currentData2 = [];
-        let isDarkTheme = false;
+    <div class="input-section">
+      <input type="text" id="dataInput1" placeholder="Enter Dataset 1 (e.g., 1,2,3,4,5)" />
+      <input type="text" id="dataInput2" placeholder="Enter Dataset 2 (e.g., 6,7,8,9,10)" />
+      <button onclick="processData()">Calculate</button>
+      <button onclick="toggleSort()">Toggle Sort</button>
+      <div id="errorMessage" class="error"></div>
+    </div>
 
-        // Event listener for real-time updates
-        document.getElementById('dataInput1').addEventListener('input', function(e) {
-            if (e.target.value.trim()) {
-                processData();
-            }
-        });
+    <div class="results-section">
+      <div class="stats-box">
+        <h2>Dataset 1 Statistics</h2>
+        <div class="stat-item">Mean: <span id="mean1"></span></div>
+        <div class="stat-item">Median: <span id="median1"></span></div>
+        <div class="stat-item">Mode: <span id="mode1"></span></div>
+        <div class="stat-item">Q1: <span id="q1_1"></span></div>
+        <div class="stat-item">Q3: <span id="q3_1"></span></div>
+        <div class="stat-item">Min: <span id="min1"></span></div>
+        <div class="stat-item">Max: <span id="max1"></span></div>
+        <div class="stat-item">Outliers: <span id="outliers1"></span></div>
+      </div>
 
-        document.getElementById('dataInput2').addEventListener('input', function(e) {
-            if (e.target.value.trim()) {
-                processData();
-            }
-        });
+      <div class="stats-box">
+        <h2>Dataset 2 Statistics</h2>
+        <div class="stat-item">Mean: <span id="mean2"></span></div>
+        <div class="stat-item">Median: <span id="median2"></span></div>
+        <div class="stat-item">Mode: <span id="mode2"></span></div>
+        <div class="stat-item">Q1: <span id="q1_2"></span></div>
+        <div class="stat-item">Q3: <span id="q3_2"></span></div>
+        <div class="stat-item">Min: <span id="min2"></span></div>
+        <div class="stat-item">Max: <span id="max2"></span></div>
+        <div class="stat-item">Outliers: <span id="outliers2"></span></div>
+      </div>
 
-        // Event listeners for color pickers
-        document.getElementById('color1').addEventListener('input', function() {
-            processData();
-        });
+      <!-- Visualization Section -->
+      <div class="visualization-box">
+        <h2>Box and Whisker Plot (Comparison)</h2>
+        <div id="boxPlotContainer">
+          <svg class="box-plot-svg"></svg>
+        </div>
 
-        document.getElementById('color2').addEventListener('input', function() {
-            processData();
-        });
+        <h2>Bar Graph - Key Statistics</h2>
+        <canvas id="barChart"></canvas>
 
-        document.getElementById('outlierColor').addEventListener('input', function() {
-            processData();
-        });
+        <h2>Histogram - Frequency Distribution</h2>
+        <canvas id="histogramChart"></canvas>
 
-        function processData() {
-            const input1 = document.getElementById('dataInput1').value;
-            const input2 = document.getElementById('dataInput2').value;
-            const errorElement = document.getElementById('errorMessage');
-            
-            // Data validation
-            if (!input1.trim() || !input2.trim()) {
-                errorElement.textContent = 'Please enter numbers for both datasets';
-                return;
-            }
+        <h2>Pie Chart - Sum Comparison</h2>
+        <canvas id="pieChart"></canvas>
+      </div>
 
-            const numbers1 = input1.split(',').map(num => parseFloat(num.trim()));
-            const numbers2 = input2.split(',').map(num => parseFloat(num.trim()));
-            
-            if (numbers1.some(isNaN) || numbers2.some(isNaN)) {
-                errorElement.textContent = 'Please enter valid numbers only';
-                return;
-            }
+      <div class="customization-panel">
+        <h2>Graph Customization</h2>
+        <label>
+          Dataset 1 Color:
+          <input type="color" id="color1" value="#1e40af" />
+        </label>
+        <label>
+          Dataset 2 Color:
+          <input type="color" id="color2" value="#dc2626" />
+        </label>
+        <label>
+          Outlier Color:
+          <input type="color" id="outlierColor" value="#ff0000" />
+        </label>
+        <div class="theme-toggle">
+          <button onclick="toggleTheme()">Toggle Dark Theme</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            errorElement.textContent = '';
-            currentData1 = numbers1;
-            currentData2 = numbers2;
-            updateStatistics(numbers1, numbers2);
-            drawBoxPlot(numbers1, numbers2);
-        }
+  <script>
+    let currentData1 = [];
+    let currentData2 = [];
+    let isDarkTheme = false;
+    let barChartInstance, histogramChartInstance, pieChartInstance;
 
-        function calculateStatistics(numbers) {
-            const sorted = [...numbers].sort((a, b) => a - b);
-            const length = sorted.length;
-
-            // Mean
-            const mean = numbers.reduce((a, b) => a + b) / length;
-
-            // Median
-            const median = length % 2 === 0 
-                ? (sorted[length/2 - 1] + sorted[length/2]) / 2 
-                : sorted[Math.floor(length/2)];
-
-            // Mode
-            const frequency = {};
-            numbers.forEach(num => frequency[num] = (frequency[num] || 0) + 1);
-            const mode = Object.entries(frequency)
-                .sort((a, b) => b[1] - a[1])[0][0];
-
-            // Quartiles
-            const q1Index = Math.floor(length * 0.25);
-            const q3Index = Math.floor(length * 0.75);
-            const q1 = sorted[q1Index];
-            const q3 = sorted[q3Index];
-
-            // IQR and outliers
-            const iqr = q3 - q1;
-            const lowerBound = q1 - 1.5 * iqr;
-            const upperBound = q3 + 1.5 * iqr;
-            const outliers = numbers.filter(num => num < lowerBound || num > upperBound);
-
-            // Find whisker ends (excluding outliers)
-            const minNonOutlier = sorted.find(num => num >= lowerBound) || sorted[0];
-            const maxNonOutlier = sorted.reverse().find(num => num <= upperBound) || sorted[sorted.length - 1];
-
-            return {
-                mean,
-                median,
-                mode,
-                q1,
-                q3,
-                min: minNonOutlier,
-                max: maxNonOutlier,
-                sorted,
-                outliers,
-                iqr
-            };
-        }
-
-        function updateStatistics(numbers1, numbers2) {
-            const stats1 = calculateStatistics(numbers1);
-            const stats2 = calculateStatistics(numbers2);
-            
-            // Update Dataset 1 stats
-            document.getElementById('mean1').textContent = stats1.mean.toFixed(2);
-            document.getElementById('median1').textContent = stats1.median.toFixed(2);
-            document.getElementById('mode1').textContent = stats1.mode;
-            document.getElementById('q1_1').textContent = stats1.q1.toFixed(2);
-            document.getElementById('q3_1').textContent = stats1.q3.toFixed(2);
-            document.getElementById('min1').textContent = stats1.min.toFixed(2);
-            document.getElementById('max1').textContent = stats1.max.toFixed(2);
-            document.getElementById('outliers1').textContent = stats1.outliers.length ? stats1.outliers.join(', ') : 'None';
-
-            // Update Dataset 2 stats
-            document.getElementById('mean2').textContent = stats2.mean.toFixed(2);
-            document.getElementById('median2').textContent = stats2.median.toFixed(2);
-            document.getElementById('mode2').textContent = stats2.mode;
-            document.getElementById('q1_2').textContent = stats2.q1.toFixed(2);
-            document.getElementById('q3_2').textContent = stats2.q3.toFixed(2);
-            document.getElementById('min2').textContent = stats2.min.toFixed(2);
-            document.getElementById('max2').textContent = stats2.max.toFixed(2);
-            document.getElementById('outliers2').textContent = stats2.outliers.length ? stats2.outliers.join(', ') : 'None';
-        }
-
-        function drawBoxPlot(numbers1, numbers2) {
-            const stats1 = calculateStatistics(numbers1);
-            const stats2 = calculateStatistics(numbers2);
-            
-            // Clear previous plot
-            const svg = d3.select('.box-plot-svg');
-            svg.selectAll('*').remove();
-
-            // Set up dimensions
-            const margin = {top: 40, right: 40, bottom: 40, left: 60};
-            const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
-            const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
-
-            // Create scales
-            const y = d3.scaleLinear()
-                .domain([
-                    Math.min(...numbers1, ...numbers2, stats1.min, stats2.min) - Math.max(stats1.iqr, stats2.iqr) * 0.5,
-                    Math.max(...numbers1, ...numbers2, stats1.max, stats2.max) + Math.max(stats1.iqr, stats2.iqr) * 0.5
-                ])
-                .range([height, 0]);
-
-            // Add Y axis
-            const g = svg.append('g')
-                .attr('transform', `translate(${margin.left},${margin.top})`);
-
-            g.append('g')
-                .call(d3.axisLeft(y));
-
-            // Draw boxes
-            const boxWidth = 80;
-            const boxX1 = width / 4 - boxWidth / 2;
-            const boxX2 = (3 * width) / 4 - boxWidth / 2;
-
-            // Get colors from color pickers
-            const color1 = document.getElementById('color1').value;
-            const color2 = document.getElementById('color2').value;
-            const outlierColor = document.getElementById('outlierColor').value;
-
-            // Draw Dataset 1 box
-            g.append('rect')
-                .attr('class', 'box')
-                .attr('x', boxX1)
-                .attr('y', y(stats1.q3))
-                .attr('width', boxWidth)
-                .attr('height', y(stats1.q1) - y(stats1.q3))
-                .style('fill', color1 + '33') // Add opacity
-                .style('stroke', color1);
-
-            // Draw Dataset 1 median line
-            g.append('line')
-                .attr('class', 'median-line')
-                .attr('x1', boxX1)
-                .attr('x2', boxX1 + boxWidth)
-                .attr('y1', y(stats1.median))
-                .attr('y2', y(stats1.median));
-
-            // Draw Dataset 1 whiskers
-            g.append('line')
-                .attr('class', 'whisker')
-                .attr('x1', boxX1 + boxWidth / 2)
-                .attr('x2', boxX1 + boxWidth / 2)
-                .attr('y1', y(stats1.min))
-                .attr('y2', y(stats1.q1));
-
-            g.append('line')
-                .attr('class', 'whisker')
-                .attr('x1', boxX1 + boxWidth / 2)
-                .attr('x2', boxX1 + boxWidth / 2)
-                .attr('y1', y(stats1.q3))
-                .attr('y2', y(stats1.max));
-
-            // Draw Dataset 1 outliers
-            stats1.outliers.forEach(outlier => {
-                g.append('circle')
-                    .attr('class', 'outlier')
-                    .attr('cx', boxX1 + boxWidth / 2)
-                    .attr('cy', y(outlier))
-                    .attr('r', 4)
-                    .style('fill', outlierColor);
-            });
-
-            // Draw Dataset 2 box
-            g.append('rect')
-                .attr('class', 'box')
-                .attr('x', boxX2)
-                .attr('y', y(stats2.q3))
-                .attr('width', boxWidth)
-                .attr('height', y(stats2.q1) - y(stats2.q3))
-                .style('fill', color2 + '33') // Add opacity
-                .style('stroke', color2);
-
-            // Draw Dataset 2 median line
-            g.append('line')
-                .attr('class', 'median-line')
-                .attr('x1', boxX2)
-                .attr('x2', boxX2 + boxWidth)
-                .attr('y1', y(stats2.median))
-                .attr('y2', y(stats2.median));
-
-            // Draw Dataset 2 whiskers
-            g.append('line')
-                .attr('class', 'whisker')
-                .attr('x1', boxX2 + boxWidth / 2)
-                .attr('x2', boxX2 + boxWidth / 2)
-                .attr('y1', y(stats2.min))
-                .attr('y2', y(stats2.q1));
-
-            g.append('line')
-                .attr('class', 'whisker')
-                .attr('x1', boxX2 + boxWidth / 2)
-                .attr('x2', boxX2 + boxWidth / 2)
-                .attr('y1', y(stats2.q3))
-                .attr('y2', y(stats2.max));
-
-            // Draw Dataset 2 outliers
-            stats2.outliers.forEach(outlier => {
-                g.append('circle')
-                    .attr('class', 'outlier')
-                    .attr('cx', boxX2 + boxWidth / 2)
-                    .attr('cy', y(outlier))
-                    .attr('r', 4)
-                    .style('fill', outlierColor);
-            });
-
-            // Add labels
-            g.append('text')
-                .attr('x', -height/2)
-                .attr('y', -40)
-                .attr('transform', 'rotate(-90)')
-                .attr('text-anchor', 'middle')
-                .text('Values');
-        }
-
-        function toggleSort() {
-            if (currentData1.length === 0 || currentData2.length === 0) return;
-            const sorted1 = [...currentData1].sort((a, b) => a - b);
-            const sorted2 = [...currentData2].sort((a, b) => a - b);
-            document.getElementById('dataInput1').value = sorted1.join(', ');
-            document.getElementById('dataInput2').value = sorted2.join(', ');
-            processData();
-        }
-
-        function toggleTheme() {
-            isDarkTheme = !isDarkTheme;
-            document.body.classList.toggle('dark-theme', isDarkTheme);
-        }
-
-        // Initialize with sample data
-        document.getElementById('dataInput1').value = "15, 25, 35, 40, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100";
-        document.getElementById('dataInput2').value = "10, 20, 30, 45, 55, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110";
+    // Event listeners for real-time updates
+    document.getElementById("dataInput1").addEventListener("input", function (e) {
+      if (e.target.value.trim()) {
         processData();
-    </script>
+      }
+    });
+    document.getElementById("dataInput2").addEventListener("input", function (e) {
+      if (e.target.value.trim()) {
+        processData();
+      }
+    });
+    // Color picker listeners
+    document.getElementById("color1").addEventListener("input", processData);
+    document.getElementById("color2").addEventListener("input", processData);
+    document.getElementById("outlierColor").addEventListener("input", processData);
+
+    function processData() {
+      const input1 = document.getElementById("dataInput1").value;
+      const input2 = document.getElementById("dataInput2").value;
+      const errorElement = document.getElementById("errorMessage");
+
+      // Data validation
+      if (!input1.trim() || !input2.trim()) {
+        errorElement.textContent = "Please enter numbers for both datasets";
+        return;
+      }
+      const numbers1 = input1.split(",").map(num => parseFloat(num.trim()));
+      const numbers2 = input2.split(",").map(num => parseFloat(num.trim()));
+      if (numbers1.some(isNaN) || numbers2.some(isNaN)) {
+        errorElement.textContent = "Please enter valid numbers only";
+        return;
+      }
+      errorElement.textContent = "";
+      currentData1 = numbers1;
+      currentData2 = numbers2;
+
+      // Calculate statistics once
+      const stats1 = calculateStatistics(numbers1);
+      const stats2 = calculateStatistics(numbers2);
+      updateStatistics(stats1, stats2);
+      drawBoxPlot(numbers1, numbers2, stats1, stats2);
+      drawBarChart(stats1, stats2);
+      drawHistogram(numbers1, numbers2);
+      drawPieChart(numbers1, numbers2);
+    }
+
+    function calculateStatistics(numbers) {
+      const sorted = [...numbers].sort((a, b) => a - b);
+      const length = sorted.length;
+      // Mean
+      const mean = numbers.reduce((a, b) => a + b) / length;
+      // Median
+      const median =
+        length % 2 === 0
+          ? (sorted[length / 2 - 1] + sorted[length / 2]) / 2
+          : sorted[Math.floor(length / 2)];
+      // Mode (first most frequent)
+      const frequency = {};
+      numbers.forEach(num => (frequency[num] = (frequency[num] || 0) + 1));
+      const mode = Object.entries(frequency).sort((a, b) => b[1] - a[1])[0][0];
+      // Quartiles
+      const q1Index = Math.floor(length * 0.25);
+      const q3Index = Math.floor(length * 0.75);
+      const q1 = sorted[q1Index];
+      const q3 = sorted[q3Index];
+      // IQR and outliers
+      const iqr = q3 - q1;
+      const lowerBound = q1 - 1.5 * iqr;
+      const upperBound = q3 + 1.5 * iqr;
+      const outliers = numbers.filter(num => num < lowerBound || num > upperBound);
+      // Find whisker ends (excluding outliers)
+      const minNonOutlier = sorted.find(num => num >= lowerBound) || sorted[0];
+      const maxNonOutlier = [...sorted].reverse().find(num => num <= upperBound) || sorted[sorted.length - 1];
+
+      return {
+        mean,
+        median,
+        mode,
+        q1,
+        q3,
+        min: minNonOutlier,
+        max: maxNonOutlier,
+        sorted,
+        outliers,
+        iqr
+      };
+    }
+
+    function updateStatistics(stats1, stats2) {
+      // Update Dataset 1 stats
+      document.getElementById("mean1").textContent = stats1.mean.toFixed(2);
+      document.getElementById("median1").textContent = stats1.median.toFixed(2);
+      document.getElementById("mode1").textContent = stats1.mode;
+      document.getElementById("q1_1").textContent = stats1.q1.toFixed(2);
+      document.getElementById("q3_1").textContent = stats1.q3.toFixed(2);
+      document.getElementById("min1").textContent = stats1.min.toFixed(2);
+      document.getElementById("max1").textContent = stats1.max.toFixed(2);
+      document.getElementById("outliers1").textContent = stats1.outliers.length ? stats1.outliers.join(", ") : "None";
+
+      // Update Dataset 2 stats
+      document.getElementById("mean2").textContent = stats2.mean.toFixed(2);
+      document.getElementById("median2").textContent = stats2.median.toFixed(2);
+      document.getElementById("mode2").textContent = stats2.mode;
+      document.getElementById("q1_2").textContent = stats2.q1.toFixed(2);
+      document.getElementById("q3_2").textContent = stats2.q3.toFixed(2);
+      document.getElementById("min2").textContent = stats2.min.toFixed(2);
+      document.getElementById("max2").textContent = stats2.max.toFixed(2);
+      document.getElementById("outliers2").textContent = stats2.outliers.length ? stats2.outliers.join(", ") : "None";
+    }
+
+    function drawBoxPlot(numbers1, numbers2, stats1, stats2) {
+      // Clear previous plot
+      const svg = d3.select(".box-plot-svg");
+      svg.selectAll("*").remove();
+
+      const margin = { top: 40, right: 40, bottom: 40, left: 60 };
+      const width = svg.node().getBoundingClientRect().width - margin.left - margin.right;
+      const height = svg.node().getBoundingClientRect().height - margin.top - margin.bottom;
+
+      // Create scales using both datasets and their calculated stats
+      const y = d3.scaleLinear()
+        .domain([
+          Math.min(...numbers1, ...numbers2, stats1.min, stats2.min) - Math.max(stats1.iqr, stats2.iqr) * 0.5,
+          Math.max(...numbers1, ...numbers2, stats1.max, stats2.max) + Math.max(stats1.iqr, stats2.iqr) * 0.5
+        ])
+        .range([height, 0]);
+
+      const g = svg.append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      g.append("g").call(d3.axisLeft(y));
+
+      const boxWidth = 80;
+      const boxX1 = width / 4 - boxWidth / 2;
+      const boxX2 = (3 * width) / 4 - boxWidth / 2;
+
+      // Get custom colors
+      const color1 = document.getElementById("color1").value;
+      const color2 = document.getElementById("color2").value;
+      const outlierColor = document.getElementById("outlierColor").value;
+
+      // Draw Dataset 1 box
+      g.append("rect")
+        .attr("class", "box")
+        .attr("x", boxX1)
+        .attr("y", y(stats1.q3))
+        .attr("width", boxWidth)
+        .attr("height", y(stats1.q1) - y(stats1.q3))
+        .style("fill", color1 + "33")
+        .style("stroke", color1);
+
+      // Dataset 1 median line
+      g.append("line")
+        .attr("class", "median-line")
+        .attr("x1", boxX1)
+        .attr("x2", boxX1 + boxWidth)
+        .attr("y1", y(stats1.median))
+        .attr("y2", y(stats1.median));
+
+      // Dataset 1 whiskers
+      g.append("line")
+        .attr("class", "whisker")
+        .attr("x1", boxX1 + boxWidth / 2)
+        .attr("x2", boxX1 + boxWidth / 2)
+        .attr("y1", y(stats1.min))
+        .attr("y2", y(stats1.q1));
+      g.append("line")
+        .attr("class", "whisker")
+        .attr("x1", boxX1 + boxWidth / 2)
+        .attr("x2", boxX1 + boxWidth / 2)
+        .attr("y1", y(stats1.q3))
+        .attr("y2", y(stats1.max));
+
+      // Dataset 1 outliers
+      stats1.outliers.forEach(outlier => {
+        g.append("circle")
+          .attr("class", "outlier")
+          .attr("cx", boxX1 + boxWidth / 2)
+          .attr("cy", y(outlier))
+          .attr("r", 4)
+          .style("fill", outlierColor);
+      });
+
+      // Draw Dataset 2 box
+      g.append("rect")
+        .attr("class", "box")
+        .attr("x", boxX2)
+        .attr("y", y(stats2.q3))
+        .attr("width", boxWidth)
+        .attr("height", y(stats2.q1) - y(stats2.q3))
+        .style("fill", color2 + "33")
+        .style("stroke", color2);
+
+      // Dataset 2 median line
+      g.append("line")
+        .attr("class", "median-line")
+        .attr("x1", boxX2)
+        .attr("x2", boxX2 + boxWidth)
+        .attr("y1", y(stats2.median))
+        .attr("y2", y(stats2.median));
+
+      // Dataset 2 whiskers
+      g.append("line")
+        .attr("class", "whisker")
+        .attr("x1", boxX2 + boxWidth / 2)
+        .attr("x2", boxX2 + boxWidth / 2)
+        .attr("y1", y(stats2.min))
+        .attr("y2", y(stats2.q1));
+      g.append("line")
+        .attr("class", "whisker")
+        .attr("x1", boxX2 + boxWidth / 2)
+        .attr("x2", boxX2 + boxWidth / 2)
+        .attr("y1", y(stats2.q3))
+        .attr("y2", y(stats2.max));
+
+      // Dataset 2 outliers
+      stats2.outliers.forEach(outlier => {
+        g.append("circle")
+          .attr("class", "outlier")
+          .attr("cx", boxX2 + boxWidth / 2)
+          .attr("cy", y(outlier))
+          .attr("r", 4)
+          .style("fill", outlierColor);
+      });
+
+      // Add Y-axis label
+      g.append("text")
+        .attr("x", -height / 2)
+        .attr("y", -40)
+        .attr("transform", "rotate(-90)")
+        .attr("text-anchor", "middle")
+        .text("Values");
+    }
+
+    function drawBarChart(stats1, stats2) {
+      if (barChartInstance) barChartInstance.destroy();
+      const ctx = document.getElementById("barChart").getContext("2d");
+      const data = {
+        labels: ["Mean", "Median", "Min", "Max"],
+        datasets: [
+          {
+            label: "Dataset 1",
+            data: [stats1.mean, stats1.median, stats1.min, stats1.max],
+            backgroundColor: document.getElementById("color1").value
+          },
+          {
+            label: "Dataset 2",
+            data: [stats2.mean, stats2.median, stats2.min, stats2.max],
+            backgroundColor: document.getElementById("color2").value
+          }
+        ]
+      };
+      barChartInstance = new Chart(ctx, {
+        type: "bar",
+        data: data,
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: "Bar Graph - Key Statistics"
+            }
+          }
+        }
+      });
+    }
+
+    function drawHistogram(numbers1, numbers2) {
+      if (histogramChartInstance) histogramChartInstance.destroy();
+      const ctx = document.getElementById("histogramChart").getContext("2d");
+      const combined = numbers1.concat(numbers2);
+      const globalMin = Math.min(...combined);
+      const globalMax = Math.max(...combined);
+      const binCount = 10;
+      const binWidth = (globalMax - globalMin) / binCount;
+      let bins = [];
+      let labels = [];
+      let dataset1Counts = new Array(binCount).fill(0);
+      let dataset2Counts = new Array(binCount).fill(0);
+
+      for (let i = 0; i < binCount; i++) {
+        const binStart = globalMin + i * binWidth;
+        bins.push(binStart);
+        labels.push(`${binStart.toFixed(1)} - ${(binStart + binWidth).toFixed(1)}`);
+      }
+
+      numbers1.forEach(num => {
+        let binIndex = Math.min(Math.floor((num - globalMin) / binWidth), binCount - 1);
+        dataset1Counts[binIndex]++;
+      });
+      numbers2.forEach(num => {
+        let binIndex = Math.min(Math.floor((num - globalMin) / binWidth), binCount - 1);
+        dataset2Counts[binIndex]++;
+      });
+
+      const data = {
+        labels: labels,
+        datasets: [
+          {
+            label: "Dataset 1",
+            data: dataset1Counts,
+            backgroundColor: document.getElementById("color1").value
+          },
+          {
+            label: "Dataset 2",
+            data: dataset2Counts,
+            backgroundColor: document.getElementById("color2").value
+          }
+        ]
+      };
+
+      histogramChartInstance = new Chart(ctx, {
+        type: "bar",
+        data: data,
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: "Histogram - Frequency Distribution"
+            }
+          },
+          scales: {
+            x: { stacked: false },
+            y: { stacked: false, beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    function drawPieChart(numbers1, numbers2) {
+      if (pieChartInstance) pieChartInstance.destroy();
+      const ctx = document.getElementById("pieChart").getContext("2d");
+      const sum1 = numbers1.reduce((a, b) => a + b, 0);
+      const sum2 = numbers2.reduce((a, b) => a + b, 0);
+      const data = {
+        labels: ["Dataset 1 Sum", "Dataset 2 Sum"],
+        datasets: [
+          {
+            data: [sum1, sum2],
+            backgroundColor: [
+              document.getElementById("color1").value,
+              document.getElementById("color2").value
+            ]
+          }
+        ]
+      };
+
+      pieChartInstance = new Chart(ctx, {
+        type: "pie",
+        data: data,
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: "Pie Chart - Sum Comparison"
+            }
+          }
+        }
+      });
+    }
+
+    function toggleSort() {
+      if (!currentData1.length || !currentData2.length) return;
+      const sorted1 = [...currentData1].sort((a, b) => a - b);
+      const sorted2 = [...currentData2].sort((a, b) => a - b);
+      document.getElementById("dataInput1").value = sorted1.join(", ");
+      document.getElementById("dataInput2").value = sorted2.join(", ");
+      processData();
+    }
+
+    function toggleTheme() {
+      isDarkTheme = !isDarkTheme;
+      document.body.classList.toggle("dark-theme", isDarkTheme);
+    }
+
+    // Initialize with sample data
+    document.getElementById("dataInput1").value =
+      "15, 25, 35, 40, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100";
+    document.getElementById("dataInput2").value =
+      "10, 20, 30, 45, 55, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110";
+    processData();
+  </script>
 </body>
 </html>
